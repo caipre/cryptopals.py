@@ -1,0 +1,6 @@
+def xor(left, right):
+    return hex(left ^ right)[:-1]
+
+ret = xor(0x1c0111001f010100061a024b53535009181c, 0x686974207468652062756c6c277320657965)
+print ret
+assert ret == '0x746865206b696420646f6e277420706c6179'
