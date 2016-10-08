@@ -79,4 +79,4 @@ blocksize = detect_blocksize()
 assert blocksize == AES.block_size
 assert is_ecb(blocksize)
 print 'blocksize:', blocksize
-print decrypt(blocksize)
+#rint decrypt(blocksize)
