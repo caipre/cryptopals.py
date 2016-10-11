@@ -39,7 +39,9 @@ def encrypt():
     ]
 
     string = random.choice(strings)
+   # string = strings[0]
     padstr = pad(string.decode('base64'))
+    print padstr.encode('hex')
     #padstr = pad('yellow submarine')
 
     iv = chr(0x0) * AES.block_size
@@ -55,7 +57,7 @@ def check(ciphertext):
         padnum = ord(text[-1])
         if not 1 <= padnum <= 16:
             return False
-        if not text[-padnum:] == chr(padnum) * padnum:
+        if text[-padnum:] != chr(padnum) * padnum:
             return False
         return True
 
@@ -77,12 +79,12 @@ def blocks(ciphertext):
 def padattack():
     def blockpairs(text):
         i = 0
-        while i + AES.block_size < len(text):
+        while i + 2*AES.block_size <= len(text):
             yield text[i:i+AES.block_size], text[i+AES.block_size:i+2*AES.block_size]
             i += AES.block_size
 
     def solvebyte(pos, blocka, blockb, known):
-        for char in range(256):
+        for char in range(255,0,-1):
             block = list(blocka)
             block[-pos] = chr(ord(block[-pos]) ^ char ^ pos)
             for i in range(pos-1,0,-1):
@@ -90,6 +92,7 @@ def padattack():
             trycipher = ''.join(block) + blockb
             if check(trycipher):
                 return chr(char)
+        raise Exception
 
     ciphertext, iv = encrypt()
     print blocks(iv + ciphertext)
