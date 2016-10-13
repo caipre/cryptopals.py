@@ -4,7 +4,6 @@ import random
 from Crypto.Cipher import AES
 
 KEY = os.urandom(AES.block_size)
-#KEY = 'new phish album.'
 
 def blocks(ciphertext):
     blocks = []
@@ -39,10 +38,9 @@ def encrypt():
     ]
 
     string = random.choice(strings)
-   # string = strings[0]
+
+    string = strings[0]
     padstr = pad(string.decode('base64'))
-    print padstr.encode('hex')
-    #padstr = pad('yellow submarine')
 
     iv = chr(0x0) * AES.block_size
     key = KEY
@@ -84,15 +82,20 @@ def padattack():
             i += AES.block_size
 
     def solvebyte(pos, blocka, blockb, known):
-        for char in range(255,0,-1):
-            block = list(blocka)
+        block = list(blocka)
+        for i in range(pos-1,0,-1):
+            block[-i] = chr(ord(block[-i]) ^ ord(known[-i]) ^ pos)
+
+        for char in range(256):
+            #if char == len(filter(lambda e: e, known)) and not any(known): continue
+            if char == pos and not any(known): continue
+            block[-pos] = blocka[-pos]
             block[-pos] = chr(ord(block[-pos]) ^ char ^ pos)
-            for i in range(pos-1,0,-1):
-                block[-i] = chr(ord(block[-i]) ^ ord(known[-i]) ^ pos)
             trycipher = ''.join(block) + blockb
+
             if check(trycipher):
                 return chr(char)
-        raise Exception
+        return chr(0x01) # padding is 1!
 
     ciphertext, iv = encrypt()
     print blocks(iv + ciphertext)
